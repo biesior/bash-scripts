@@ -1,0 +1,516 @@
+#!/bin/bash
+
+# Author (c) 2020 Marcus Biesioroff biesior@gmail.com
+# https://github.com/biesior/bash-scripts
+# For learning purposes!
+
+
+# most probably you will need to change these
+CFG_EDITOR="open -e"
+CFG_APACHE_PATH="/xampp/etc/"
+CFG_VHOST_FILE="/xampp/etc/extra/httpd-vhosts.conf"
+CERT_FOLDER="/xampp/etc/ssl/"
+
+
+# don't change these without reason, you can set them via options, see help
+IS_MARKDOWN=false
+INTERACTIVE=false
+TOPIC=basic
+MUTED=false
+
+###################################
+######
+###### DONT CHANGE ANYTHING BELLOW!
+######
+###################################
+
+# Just for coloring like a kid :D
+function setDefaultStyle() {
+  BLACK="\033[0;30m"
+  RED="\033[0;31m"
+  GREEN="\033[0;32m"
+  YELLOW="\033[0;33m"
+  BLUE="\033[0;34m"
+  MAGENTA="\033[0;35m"
+  CYAN="\033[0;36m"
+  WHITE="\033[0;37m"
+  DIM="\033[2;37m"
+  ESC="\033[0m"
+  CODE_BLOCK="\033[0;36m"
+  CODE_COLOR="\033[0;36m"
+  HELP_COLOR="\033[0;36m"
+  CODE_LINE="\033[0;36m"
+  ESC_BLOCK="\033[0m"
+  ESC_LINE="\033[0m"
+}
+
+function setRawStyle() {
+
+  CODE_BLOCK=""
+  CODE_COLOR=""
+  ESC_BLOCK=""
+
+  CODE_LINE=""
+  ESC_LINE=""
+
+  HELP_COLOR=""
+
+  BLACK=""
+  RED=""
+  GREEN=""
+  YELLOW=""
+  BLUE=""
+  MAGENTA=""
+  CYAN=""
+  WHITE=""
+  DIM=""
+  ESC=""
+  echo Using raw mode now
+}
+function setMarkdownStyle() {
+  setRawStyle
+  CODE_BLOCK="\`\`\`
+"
+  ESC_BLOCK="
+\`\`\`"
+
+  CODE_LINE="\`"
+  ESC_LINE="\`"
+  echo Using markdown mode now
+}
+
+DOMAIN=$1
+ROOT=$2
+
+function renderBasic_0() {
+  if [ "$MUTED" != true ]; then
+    echo -e "
+${GREEN}Aloha!${ESC}
+
+This is some suggestion for your ${GREEN}${DOMAIN}${ESC} domain with root in ${GREEN}${ROOT}${ESC} directory
+
+${YELLOW}Note it doesn't modify your existing files, just show some sample${ESC}
+
+Just place it in your ${CODE_LINE}httpd-vhosts.conf${ESC_LINE} file.
+And don't forget to restart the Apache server!
+"
+  fi #muted
+
+  echo -e "${CODE_BLOCK}${DIM}# Virtual host for ${DOMAIN}${ESC}
+${CODE_COLOR}<VirtualHost *:80>
+
+    ServerAdmin youremail+${DOMAIN}@gmail.com
+    DocumentRoot \"${ROOT}\"
+    ServerName ${DOMAIN}
+    ServerAlias *.${DOMAIN}
+    ErrorLog  \"logs/${DOMAIN}-error_log\"
+    CustomLog \"logs/${DOMAIN}-access_log\" common
+
+    <Directory \"${ROOT}\">
+        Options Indexes FollowSymLinks ExecCGI Includes
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+        Require all granted
+    </Directory>
+
+</VirtualHost>${ESC_BLOCK}
+"
+
+} #end of renderBasic()
+
+function renderSSL_1() {
+  if [ $MUTED != true ]; then
+    echo -e "Optionally you can add SSL:"
+  fi
+  echo -e "
+${DIM}# Virtual SSL host for ${DOMAIN} (if certificate created)${ESC}
+${CODE_BLOCK}<VirtualHost ${DOMAIN}:443>
+
+    ServerAdmin youremail+${DOMAIN}@gmail.com
+    DocumentRoot \"${ROOT}\"
+    ServerName ${DOMAIN}
+    ServerAlias *.${DOMAIN}
+    ErrorLog  \"logs/${DOMAIN}-error_log\"
+    CustomLog \"logs/${DOMAIN}-access_log\" common
+
+   SSLEngine on
+   SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL
+   SSLCertificateFile ${CERT_FOLDER}${DOMAIN}.crt
+   SSLCertificateKeyFile ${CERT_FOLDER}${DOMAIN}.key
+
+   <Directory \"${ROOT}\">
+       Options Indexes FollowSymLinks ExecCGI Includes
+       AllowOverride All
+       Order allow,deny
+       Allow from all
+       Require all granted
+   </Directory>
+</VirtualHost>${ESC_BLOCK}
+
+"
+} # end of renderSSl
+
+function renderCerts_2() {
+  if [ $MUTED != true ]; then
+    echo -e "
+${GREEN}Welcome :D This script shows how to enable SSL vhost fpr different ways${ESC}
+
+This script is bring to you by ${RED}Marcus Biesioroff ];->${ESC}
+
+Concept by: ${GREEN}Xcreate${ESC}, you can see his talking head here: ${GREEN}https://www.youtube.com/watch?v=-VxQU1w9L6w${ESC}, kudos!
+
+Things to do${ESC}
+
+To create keys first create a dir ${YELLOW}(if doesn't exist only)${ESC}
+
+${CODE_BLOCK}sudo mkdir ${CFG_APACHE_PATH}ssl${ESC_BLOCK}
+
+Generate certificates"
+  fi
+
+  echo -e "
+${CODE_LINE}sudo openssl genrsa -out ${CFG_APACHE_PATH}ssl/${DOMAIN}.key 2048${ESC_LINE}
+${CODE_LINE}sudo openssl req -new -x509 -key ${CFG_APACHE_PATH}ssl/$DOMAIN.key -out ${CFG_APACHE_PATH}ssl/${DOMAIN}.crt -days 3650 -subj /CN=${DOMAIN}${ESC_LINE}"
+
+  if [ $MUTED != true ]; then
+    echo -e "
+Add new certificate to Keychains"
+  fi
+  echo -e "
+${CODE_BLOCK}sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ${CFG_APACHE_PATH}ssl/${DOMAIN}.crt${ESC_BLOCK}"
+
+  if [ $MUTED != true ]; then
+    echo -e "
+Setup VHOST  with port ${GREEN}443${ESC}
+
+Open your vhosts file"
+  fi
+
+  echo -e "
+${CODE_BLOCK}${CFG_EDITOR} ${CFG_VHOST_FILE}${ESC_BLOCK}"
+
+  if [ $MUTED != true ]; then
+    echo -e "
+And add this vhost ${YELLOW}(modify if exists)${ESC}
+
+"
+  fi
+}
+function renderDefaultCert_3() {
+  if [ $MUTED != true ]; then
+    echo -e "
+If you want to set default certificate for all domains edit this file
+${RED}(be careful! it's enough to setup separate cert for each local domain)${ESC}"
+  fi #muted
+
+  echo -e "
+${CODE_BLOCK}${CFG_EDITOR} ${CFG_APACHE_PATH}extra/httpd-ssl.conf${ESC_BLOCK}"
+
+  if [ $MUTED != true ]; then
+    echo -e "And change these values:"
+  fi
+
+  echo -e "
+${CODE_BLOCK}SSLCertificateFile \"${CFG_APACHE_PATH}/ssl /${DOMAIN}.crt\"
+SSLCertificateKeyFile \"${CFG_APACHE_PATH}/ssl /${DOMAIN}.key\"${ESC_BLOCK}
+
+"
+  if [ $MUTED != true ]; then
+    echo -e "
+${GREEN}That's all about certificates, bye :)${ESC}
+
+"
+  fi #muted
+} #end of renderDefaultCert()
+
+function die() {
+  pressAnyKeyToFinish
+  printf '%s\n' "$1" >&2
+  exit 1
+}
+
+function displayHint() {
+  echo $'\033[0;31mHey! Wrong arguments supplied, exactly three: domain, rootpath and third y or n for markdown are required like:\033[0m
+
+
+\033[0;32mvhost-template domain.loc /www/projects/domain y\033[0m'
+} # displayHint() end
+
+function clearConsole() {
+  printf "\033c"
+}
+
+function pressAnyKeyToContinue() {
+  if [ "$INTERACTIVE" = true ]; then
+    read -n 1 -s -r -p $'
+
+\033[2;37m(press any key to finish...)\033[0m
+'
+  fi
+}
+function pressAnyKeyToFinish() {
+  if [ "$INTERACTIVE" = true ]; then
+    read -n 1 -s -r -p $'
+
+\033[2;37m(press any key to finish...)\033[0m
+'
+  fi
+}
+function pressEnterToContinue() {
+  if [ "$INTERACTIVE" = true ]; then
+    read -r -p $'
+
+\033[2;37m(press enter to continue...)\033[0m
+'
+    clearConsole
+  fi
+
+}
+# pressAnyKey() end
+
+function pause() {
+  read -rp "$*"
+}
+
+function firstCheck() {
+  if [ $# -ne 3 ]; then
+    displayHint
+    pressAnyKeyToFinish
+    exit 1
+  fi
+
+  echo Markdown is "$IS_MARKDOWN"
+} # firstCheck() end
+function suggestOtherTopics() {
+  if [ $MUTED != true ]; then
+    echo -e "${GREEN}Info:${ESC}
+
+You can also try these topics: ${GREEN}-t basic${ESC}, ${GREEN}-t ssl${ESC}, ${GREEN}-t cert${ESC}, ${GREEN}-t all${ESC}"
+  fi
+}
+function sayGoodBye() {
+  if [ $MUTED != true ]; then
+    echo -e "
+
+${GREEN}Bye :)${ESC}
+"
+  fi
+} # sayGoodbye() end
+
+function showHelp() {
+  echo -e "
+${GREEN}This is help${ESC}
+
+${HELP_COLOR}-h --help${ESC}         To display this help
+${HELP_COLOR}-d --domain${ESC}       (required) name of the domain for this VHOST <ServerName>
+${HELP_COLOR}-r --root${ESC}         (required) name of the domain for this VHOST <DocumentRoot>
+${HELP_COLOR}-t --topic${ESC}        Topic to display, possible values
+
+                  ${HELP_COLOR}basic${ESC} Displays basic VHOST at port 80
+                  ${HELP_COLOR}ssl${ESC}   Displays SSL VHOST at port 443 and explains how to create certificate files
+                  ${HELP_COLOR}cert${ESC}  Explains  how to setup default certificate
+                  ${HELP_COLOR}all${ESC}   Displays all above
+
+${HELP_COLOR}-m --mode${ESC}         Mode for displaying
+
+                  ${HELP_COLOR}raw${ESC}      Displays basic VHOST at port 80
+                  ${HELP_COLOR}markdown${ESC} Displays SSL VHOST at port 443 and explains how to create certificate files
+                  if not set default with colors
+
+${HELP_COLOR}-i --interactive${ESC}  If interactive is enabled longer samples will be displayed one-by-one with brake for coffee
+${HELP_COLOR}--muted${ESC}           If muted most instructions will be disabled code will be shown only
+
+Shortcuts:
+
+If you just want to generate vhosts and/or certivicates, just use these shortcuts (muted)
+
+${HELP_COLOR}--vhost${ESC}           Gets two unnamed params, domain and root, see samples
+${HELP_COLOR}--vhost-ssl${ESC}       Same as above, but shows SSL vhost
+${HELP_COLOR}--cert-ssl${ESC}        Same as above, but shows certificate generation
+
+Samples:
+
+${CODE_COLOR}vhost-template -d my-project-1.loc -r /www/projects/my-project-1.loc$ --topic all --interactive ${ESC}
+
+These three will show ready to use vhosts + certificates
+${CODE_COLOR}vhost-template --muted --vhost     foo.loc /www/projects/foo${ESC}
+${CODE_COLOR}vhost-template --muted --vhost-ssl foo.loc /www/projects/foo${ESC}
+${CODE_COLOR}vhost-template --muted --cert-ssl  foo.loc /www/projects/foo${ESC}
+"
+}
+
+setDefaultStyle
+
+domainIsSet=false
+rootIsSet=false
+while :; do
+  case $1 in
+  -h | -\? | --help)
+    showHelp # Display a usage synopsis.
+    exit
+    ;;
+
+  --vhost)
+    if [ "$2" ] && [ "$3" ]; then
+      DOMAIN=$2
+      ROOT=$3
+      renderBasic_0
+      shift
+      exit
+    else
+      die 'ERROR: "--vhost" requires two non-empty option arguments.'
+    fi
+    ;;
+
+  --vhost-ssl)
+    if [ "$2" ] && [ "$3" ]; then
+      DOMAIN=$2
+      ROOT=$3
+      renderSSL_1
+      shift
+      exit
+    else
+      die 'ERROR: "--vhost-ssl" requires two non-empty option arguments.'
+    fi
+    ;;
+  --cert-ssl)
+    if [ "$2" ] && [ "$3" ]; then
+      DOMAIN=$2
+      ROOT=$3
+      renderCerts_2
+      shift
+      exit
+    else
+      die 'ERROR: "--cert-ssl" requires two non-empty option arguments.'
+    fi
+    ;;
+  -i | --interactive)
+    INTERACTIVE=true
+    ;;
+  --muted)
+    MUTED=true
+    ;;
+  --unmuted)
+    MUTED=false
+    echo $MUTED
+    ;;
+  -d | --domain) # Takes an option argument; ensure it has been specified.
+    if [ "$2" ]; then
+      DOMAIN=$2
+      domainIsSet=true
+      shift
+    else
+      die 'ERROR: "--domain" requires a non-empty option argument.'
+    fi
+    ;;
+  -r | --root) # Takes an option argument; ensure it has been specified.
+    if [ "$2" ]; then
+      ROOT=$2
+      rootIsSet=true
+      shift
+    else
+      die 'ERROR: "--root" requires a non-empty option argument.'
+    fi
+    ;;
+  -t | --topic) # Takes an option argument; ensure it has been specified.
+    if [ "$2" ]; then
+      case "$2" in
+      "basic") TOPIC=basic ;;
+      "ssl") TOPIC=ssl ;;
+      "cert") TOPIC=cert ;;
+      "all") TOPIC=all ;;
+      *) #default topic set earlier
+        ;;
+      esac
+
+      shift
+    else
+      die 'ERROR: "--mode" requires a non-empty option argument.'
+    fi
+    ;;
+  -m | --mode) # Takes an option argument; ensure it has been specified.
+    if [ "$2" ]; then
+      case "$2" in
+      "raw") setRawStyle ;;
+      "markdown") setMarkdownStyle ;;
+      *) setDefaultStyle ;;
+      esac
+
+      shift
+    else
+      die 'ERROR: "--mode" requires a non-empty option argument. `raw`, `markdown` or none allowed'
+    fi
+    ;;
+  --) # End of all options.
+    shift
+    break
+    ;;
+  -?*)
+    printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+    ;;
+  *) # Default case: No more options, so break out of the loop.
+    break
+    ;;
+  esac
+
+  shift
+done
+
+if [ $domainIsSet = false ] || [ $rootIsSet = false ]; then
+  pressAnyKeyToFinish
+  die "ERROR: Params: --domain (-d) and --root (-r) must be always settt
+
+see documentation for details using vhost-template -h
+  "
+
+fi
+
+if [ $INTERACTIVE = true ]; then
+  clearConsole
+fi
+
+case $TOPIC in
+basic)
+  renderBasic_0
+  pressEnterToContinue
+  suggestOtherTopics
+  pressAnyKeyToFinish
+  sayGoodBye
+  ;;
+ssl)
+  renderSSL_1
+  pressEnterToContinue
+  suggestOtherTopics
+  pressAnyKeyToFinish
+  sayGoodBye
+  ;;
+cert)
+  renderCerts_2
+  pressEnterToContinue
+  renderDefaultCert_3
+  pressEnterToContinue
+  suggestOtherTopics
+  pressAnyKeyToFinish
+  sayGoodBye
+  ;;
+all)
+  renderBasic_0
+  pressEnterToContinue
+  renderSSL_1
+  pressEnterToContinue
+  renderCerts_2
+  pressEnterToContinue
+  renderDefaultCert_3
+  pressEnterToContinue
+  suggestOtherTopics
+  pressAnyKeyToFinish
+  sayGoodBye
+  ;;
+*) ;;
+
+esac
+
+if [ $INTERACTIVE = true ]; then
+  echo "That's all, you used interactive mode, but can still see what was done by scrolling up. ciao :*"
+fi
