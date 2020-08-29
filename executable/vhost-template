@@ -4,6 +4,13 @@
 # https://github.com/biesior/bash-scripts
 # For learning purposes!
 
+# This script doesn't create or modify any existing files it's for learning purposes,
+# however may be used for creating own vhosts
+# just download and modify some first variables below, to fir your lsb_release -a
+# This sample was created at Mac, so it should be adaptable at any linux
+#
+# Check the help with -h option for more informations
+
 
 # most probably you will need to change these
 CFG_EDITOR="open -e"
