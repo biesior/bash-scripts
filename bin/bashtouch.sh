@@ -1,66 +1,103 @@
 #!/usr/bin/env bash
 # Author (c) 2020 Marcus Biesioroff biesior@gmail.com
 # https://github.com/biesior/bash-scripts
-# Latest updated in 1.0.1
-# Donate author: https://www.paypal.com/paypalme/biesior/4.99EUR
+# Latest updated in 1.0.2
+# Donate author: https://paypal.me/biesior/4.99EUR
 #
 # Description:
 # Allows to fast create (touch) bash scripts and optionally open it in preferred editor
-# for more details run `bashtouch -h`
+# for more details run `bashtouch.sh -h`
 
+# To disable colors permanently, just set DisableColors to true.
+DisableColors=false
+
+# Try to not change anything below
+# If you think you can improve this script, share with us via:
+# https://github.com/biesior/bash-scripts/issues
 
 AnsiRed="\033[31m"
 AnsiGreen="\033[32m"
 AnsiCyan="\033[36m"
 AnsiReset="\033[0m"
+function disableColors() {
+  AnsiRed=""
+  AnsiGreen=""
+  AnsiCyan=""
+  AnsiReset=""
+}
+if [ $DisableColors = true ]; then
+  disableColors
+fi
 
 if [ "$1" = "" ]; then
-  echo -e "${AnsiRed}Error! ${AnsiReset}No filename specified"
+  echo -e "${AnsiRed}Error! ${AnsiReset}No filename specified
+Use ${AnsiCyan}bashtouch.sh -h${AnsiReset} for help
+"
   exit 1
 fi
 
 FileName="$1"
 Shebang="#!/usr/bin/env bash"
 if [[ "$FileName" == -h ]] || [[ "$FileName" == --help ]]; then
-  echo -e "${AnsiGreen}bashtouch help: ${AnsiReset}
+  echo -e "
+${AnsiGreen}Help for bashtouch.sh ver.: 1.0.2 ${AnsiReset}
+
 © 2020 Marcus biesior Biesioroff
 
-Basic syntax:
-${AnsiCyan}bashtouch <filepath><optional-extension> <optional editor>${AnsiReset}
+${AnsiGreen}What it does?${AnsiReset}
+As name suggest it's bash's \`touch\` version for bash scripts.
+It just creates scratch shell script with ${AnsiGreen}.sh${AnsiReset} or ${AnsiGreen}.zsh${AnsiReset}, proper shebang and sample code inside.
 
-Where:
-${AnsiCyan}<filepath>${AnsiReset} is absolute or relative path for new created script
-${AnsiCyan}<optional-extension>${AnsiReset} should be one of: ${AnsiGreen}.sh${AnsiReset}, ${AnsiGreen}.zsh${AnsiReset}, ${AnsiGreen}.bash${AnsiReset} for bash script, if none ${AnsiGreen}.sh${AnsiReset} will be added
-${AnsiCyan}<optional editor> ${AnsiReset} If specified, after creation the file it will be opened in this editor, possibilities:
+You can reuse sample code or remove it and write your own.
 
-Command line editors (if installed):
-${AnsiGreen}vim${AnsiReset}, ${AnsiGreen}nano${AnsiReset}, ${AnsiGreen}jed${AnsiReset}
+Just leave generated shebang.
+See: https://en.wikipedia.org/wiki/Shebang_(Unix)
 
-GUI editors on Mac (if installed):
-${AnsiGreen}edit${AnsiReset} for default OSX editor,
-${AnsiGreen}sublime${AnsiReset} for OSX Sublime Text.app,
-${AnsiGreen}textedit${AnsiReset} for OSX TextEdit.app
+${AnsiGreen}Basic syntax:${AnsiReset}
 
-Samples:
+  ${AnsiCyan}bashtouch.sh <filepath><optional-extension> <optional editor>${AnsiReset}
 
-${AnsiCyan}cd /path/with/your/executables${AnsiReset}
+${AnsiGreen}Where:${AnsiReset}
 
-To create script with \`bash\` shebang
-${AnsiCyan}bashtouch foo.sh${AnsiReset}
+  ${AnsiCyan}<filepath>${AnsiReset} is absolute or relative path for new created script, if filename only given it will create script
+             in current directory
+  ${AnsiCyan}<optional-extension>${AnsiReset} should be one of: ${AnsiGreen}.sh${AnsiReset}, ${AnsiGreen}.zsh${AnsiReset}, ${AnsiGreen}.bash${AnsiReset} for bash script, if none ${AnsiGreen}.sh${AnsiReset} will be added
+  ${AnsiCyan}<optional editor> ${AnsiReset} If specified, after creation the file it will be opened in this editor, possibilities:
 
-To create script with \`zsh\` shebang
-${AnsiCyan}bashtouch bar.zsh${AnsiReset}
+- Command line editors (if installed):
+  ${AnsiGreen}vim${AnsiReset}, ${AnsiGreen}nano${AnsiReset}, ${AnsiGreen}jed${AnsiReset}
 
-Auto extension if not given will be .sh:
-${AnsiCyan}bashtouch baz${AnsiReset} (creates baz.sh)
+- GUI editors on Mac (if installed):
+  ${AnsiGreen}edit${AnsiReset} for default OSX editor,
+  ${AnsiGreen}sublime${AnsiReset} for OSX Sublime Text.app,
+  ${AnsiGreen}textedit${AnsiReset} for OSX TextEdit.app
 
-Of course you can always use absolute or relative path for new file like:
-${AnsiCyan}bashtouch /full/path/to/zen.sh${AnsiReset}
-${AnsiCyan}bashtouch ~/in-home-directory.sh${AnsiReset}
-${AnsiCyan}bashtouch in-current-directory.sh${AnsiReset}
+${AnsiGreen}Samples:${AnsiReset}
 
-If for some reason you want/need to use file without extension, just rename it like:
+- (optionally)
+  ${AnsiCyan}cd /path/with/your/executables${AnsiReset}
+
+- To create script with \`bash\` shebang
+  ${AnsiCyan}bashtouch.sh foo.sh${AnsiReset}
+
+- To create script with \`zsh\` shebang
+  ${AnsiCyan}bashtouch.sh bar.zsh${AnsiReset}
+
+- Auto extension if not given will be .sh:
+  ${AnsiCyan}bashtouch.sh baz${AnsiReset} (creates baz.sh)
+
+- Of course you can always use absolute or relative path for new file like:
+  ${AnsiCyan}bashtouch.sh /full/path/to/zen.sh${AnsiReset}
+  ${AnsiCyan}bashtouch.sh ~/in-home-directory.sh${AnsiReset}
+  ${AnsiCyan}bashtouch.sh in-current-directory.sh${AnsiReset}
+
+If for some reason you want/need to use file without extension, just rename it after creation like:
 ${AnsiCyan}mv new-script.sh new-script${AnsiReset}
+
+${AnsiGreen}To disable colors permanently:${AnsiReset}
+Just edit the file and set value of ${AnsiCyan}DisableColors${AnsiReset} variable to ${AnsiGreen}true${AnsiReset}.
+
+${AnsiGreen}Have fun :)${AnsiReset}
 "
   exit
 fi
@@ -89,7 +126,7 @@ if test -f "$FileName"; then
 fi
 
 touch "$FileName"
-printf "${Shebang}
+printf "%s
 
 # Below code can be removed or replaced
 echo \"Hello World!\"
@@ -102,7 +139,7 @@ else
    echo \"Using another shell\"
 fi
 
-exit 0" >>"$FileName"
+exit 0" "$Shebang" >>"$FileName"
 chmod +x "$FileName"
 echo -e "${AnsiGreen}OK! ${AnsiReset}Script ${AnsiCyan}${FileName}${AnsiReset} created and chmoded +x"
 
@@ -118,4 +155,4 @@ if [ "$2" ]; then
   esac
 fi
 
-exit
+exit 0
