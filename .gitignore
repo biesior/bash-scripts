@@ -1,3 +1,12 @@
 /.idea/
-/executable-private/
+
+# Folder for diffrent scratches not to commit
 /_dont_commit/
+
+# Symlinks to folders in home
+/bin-private
+/bin-private-test
+/sbin-private
+/sbin-private-test
+/executable-private/
+/semantic-version.php
