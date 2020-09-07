@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Author (c) 2020 Marcus Biesioroff biesior@gmail.com
 # https://github.com/biesior/bash-scripts
-# Latest updated in 1.0.1
-# Donate author: https://www.paypal.com/paypalme/biesior/4.99EUR
+# Latest updated in 1.0.2
+# Donate author: https://paypal.me/biesior/4.99EUR
 #
 # Description:
 # Set (or reset) ANSI color, ie. uf you forgot to do it in your CLI app ;)

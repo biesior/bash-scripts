@@ -1,0 +1,58 @@
+Help for bashtouch.sh ver.: 1.0.2
+
+© 2020 Marcus biesior Biesioroff
+
+What it does?
+As name suggest it's bash's `touch` version for bash scripts.
+It just creates scratch shell script with .sh or .zsh, proper shebang and sample code inside.
+
+You can reuse sample code or remove it and write your own.
+
+Just leave generated shebang.
+See: https://en.wikipedia.org/wiki/Shebang_(Unix)
+
+Basic syntax:
+
+  bashtouch.sh <filepath><optional-extension> <optional editor>
+
+Where:
+
+  <filepath> is absolute or relative path for new created script, if filename only given it will create script
+             in current directory
+  <optional-extension> should be one of: .sh, .zsh, .bash for bash script, if none .sh will be added
+  <optional editor>  If specified, after creation the file it will be opened in this editor, possibilities:
+
+- Command line editors (if installed):
+  vim, nano, jed
+
+- GUI editors on Mac (if installed):
+  edit for default OSX editor,
+  sublime for OSX Sublime Text.app,
+  textedit for OSX TextEdit.app
+
+Samples:
+
+- (optionally)
+  cd /path/with/your/executables
+
+- To create script with `bash` shebang
+  bashtouch.sh foo.sh
+
+- To create script with `zsh` shebang
+  bashtouch.sh bar.zsh
+
+- Auto extension if not given will be .sh:
+  bashtouch.sh baz (creates baz.sh)
+
+- Of course you can always use absolute or relative path for new file like:
+  bashtouch.sh /full/path/to/zen.sh
+  bashtouch.sh ~/in-home-directory.sh
+  bashtouch.sh in-current-directory.sh
+
+If for some reason you want/need to use file without extension, just rename it after creation like:
+mv new-script.sh new-script
+
+To disable colors permanently:
+Just edit the file and set value of DisableColors variable to true.
+
+Have fun :)
