@@ -1,7 +1,13 @@
+# IDE
 /.idea/
 
-# Folder for diffrent scratches not to commit
+# doc generators
+.main-readme-docs.sh
+.render-*-docs.sh
+
+# Folder and files for diffrent scratches, not to commit
 /_dont_commit/
+*._dont_commit.*
 
 # Symlinks to folders in home
 /bin-private
@@ -10,3 +16,7 @@
 /sbin-private-test
 /executable-private/
 /semantic-version.php
+
+# victim folders and files are for testing and should be commited
+# They can be deleted or pruned withot warning any time...
+/victim/

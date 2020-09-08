@@ -1,23 +1,25 @@
 #!/bin/bash
-
 # Author (c) 2020 Marcus Biesioroff biesior@gmail.com
 # https://github.com/biesior/bash-scripts
-# For learning purposes!
-
+# Donate author: https://paypal.me/biesior/4.99EUR
+#
+# Description
 # This script doesn't create or modify any existing files it's for learning purposes,
-# however may be used for creating own vhosts
+# however _may_ be used for creating own vhosts
 # just download and modify some first variables below, to fir your lsb_release -a
 # This sample was created at Mac, so it should be adaptable at any linux
 #
 # Check the help with -h option for more informations
 
+# Semantic version for this script:
+SemanticProject='vhost-template.sh'
+SemanticVersion='1.0.3'
 
 # most probably you will need to change these
 CFG_EDITOR="open -e"
 CFG_APACHE_PATH="/xampp/etc/"
 CFG_VHOST_FILE="/xampp/etc/extra/httpd-vhosts.conf"
 CERT_FOLDER="/xampp/etc/ssl/"
-
 
 # don't change these without reason, you can set them via options, see help
 IS_MARKDOWN=false
@@ -33,57 +35,83 @@ MUTED=false
 
 # Just for coloring like a kid :D
 function setDefaultStyle() {
-  BLACK="\033[0;30m"
-  RED="\033[0;31m"
-  GREEN="\033[0;32m"
-  YELLOW="\033[0;33m"
-  BLUE="\033[0;34m"
-  MAGENTA="\033[0;35m"
-  CYAN="\033[0;36m"
-  WHITE="\033[0;37m"
-  DIM="\033[2;37m"
-  ESC="\033[0m"
-  CODE_BLOCK="\033[0;36m"
-  CODE_COLOR="\033[0;36m"
-  HELP_COLOR="\033[0;36m"
-  CODE_LINE="\033[0;36m"
-  ESC_BLOCK="\033[0m"
-  ESC_LINE="\033[0m"
+  FirstLine="
+"
+
+  LastLine="
+
+"
+  AnsiBlack="\033[0;30m"
+  AnsiRed="\033[0;31m"
+  AnsiGreen="\033[0;32m"
+  AnsiYellow="\033[0;33m"
+  AnsiBlue="\033[0;34m"
+  AnsiMagenta="\033[0;35m"
+  AnsiCyan="\033[0;36m"
+  AnsiWhite="\033[0;37m"
+  AnsiDim="\033[2;37m"
+  AnsiEscape="\033[0m"
+  CodeBlock="\033[0;36m"
+  CodeColor="\033[0;36m"
+  HelpColor="\033[0;36m"
+  CodeInline="\033[0;36m"
+  CodeBlockEsc="\033[0m"
+  CodeInlineEsc="\033[0m"
 }
 
 function setRawStyle() {
+  FirstLine=""
+  LastLine=""
+  CodeBlock=""
+  CodeColor=""
+  CodeBlockEsc=""
 
-  CODE_BLOCK=""
-  CODE_COLOR=""
-  ESC_BLOCK=""
+  CodeInline=""
+  CodeInlineEsc=""
 
-  CODE_LINE=""
-  ESC_LINE=""
+  HelpColor=""
 
-  HELP_COLOR=""
+  AnsiBlack=""
+  AnsiRed=""
+  AnsiGreen=""
+  AnsiYellow=""
+  AnsiBlue=""
+  AnsiMagenta=""
+  AnsiCyan=""
+  AnsiWhite=""
+  AnsiDim=""
+  AnsiEscape=""
 
-  BLACK=""
-  RED=""
-  GREEN=""
-  YELLOW=""
-  BLUE=""
-  MAGENTA=""
-  CYAN=""
-  WHITE=""
-  DIM=""
-  ESC=""
-  echo Using raw mode now
+  Header1=""
+  Header2=""
+  Header3=""
+  Header4=""
+  Header5=""
+  Header6=""
+
+
+
+  #  echo Using raw mode now
 }
 function setMarkdownStyle() {
   setRawStyle
-  CODE_BLOCK="\`\`\`
+
+  Header1="# "
+  Header2="## "
+  Header3="### "
+  Header4="#### "
+  Header5="##### "
+  Header6="###### "
+
+
+  CodeBlock="\`\`\`
 "
-  ESC_BLOCK="
+  CodeBlockEsc="
 \`\`\`"
 
-  CODE_LINE="\`"
-  ESC_LINE="\`"
-  echo Using markdown mode now
+  CodeInline="\`"
+  CodeInlineEsc="\`"
+  #  echo Using markdown mode now
 }
 
 DOMAIN=$1
@@ -92,19 +120,19 @@ ROOT=$2
 function renderBasic_0() {
   if [ "$MUTED" != true ]; then
     echo -e "
-${GREEN}Aloha!${ESC}
+${AnsiGreen}Aloha!${AnsiEscape}
 
-This is some suggestion for your ${GREEN}${DOMAIN}${ESC} domain with root in ${GREEN}${ROOT}${ESC} directory
+This is some suggestion for your ${AnsiGreen}${DOMAIN}${AnsiEscape} domain with root in ${AnsiGreen}${ROOT}${AnsiEscape} directory
 
-${YELLOW}Note it doesn't modify your existing files, just show some sample${ESC}
+${AnsiYellow}Note it doesn't modify your existing files, just show some sample${AnsiEscape}
 
-Just place it in your ${CODE_LINE}httpd-vhosts.conf${ESC_LINE} file.
+Just place it in your ${CodeInline}httpd-vhosts.conf${CodeInlineEsc} file.
 And don't forget to restart the Apache server!
 "
   fi #muted
 
-  echo -e "${CODE_BLOCK}${DIM}# Virtual host for ${DOMAIN}${ESC}
-${CODE_COLOR}<VirtualHost *:80>
+  echo -e "${CodeBlock}${AnsiDim}# Virtual host for ${DOMAIN}${AnsiEscape}
+${CodeColor}<VirtualHost *:80>
 
     ServerAdmin youremail+${DOMAIN}@gmail.com
     DocumentRoot \"${ROOT}\"
@@ -121,7 +149,7 @@ ${CODE_COLOR}<VirtualHost *:80>
         Require all granted
     </Directory>
 
-</VirtualHost>${ESC_BLOCK}
+</VirtualHost>${CodeBlockEsc}
 "
 
 } #end of renderBasic()
@@ -131,8 +159,8 @@ function renderSSL_1() {
     echo -e "Optionally you can add SSL:"
   fi
   echo -e "
-${DIM}# Virtual SSL host for ${DOMAIN} (if certificate created)${ESC}
-${CODE_BLOCK}<VirtualHost ${DOMAIN}:443>
+${AnsiDim}# Virtual SSL host for ${DOMAIN} (if certificate created)${AnsiEscape}
+${CodeBlock}<VirtualHost ${DOMAIN}:443>
 
     ServerAdmin youremail+${DOMAIN}@gmail.com
     DocumentRoot \"${ROOT}\"
@@ -153,7 +181,7 @@ ${CODE_BLOCK}<VirtualHost ${DOMAIN}:443>
        Allow from all
        Require all granted
    </Directory>
-</VirtualHost>${ESC_BLOCK}
+</VirtualHost>${CodeBlockEsc}
 
 "
 } # end of renderSSl
@@ -161,45 +189,45 @@ ${CODE_BLOCK}<VirtualHost ${DOMAIN}:443>
 function renderCerts_2() {
   if [ $MUTED != true ]; then
     echo -e "
-${GREEN}Welcome :D This script shows how to enable SSL vhost fpr different ways${ESC}
+${AnsiGreen}Welcome :D This script shows how to enable SSL vhost fpr different ways${AnsiEscape}
 
-This script is bring to you by ${RED}Marcus Biesioroff ];->${ESC}
+This script is bring to you by ${AnsiRed}Marcus Biesioroff ];->${AnsiEscape}
 
-Concept by: ${GREEN}Xcreate${ESC}, you can see his talking head here: ${GREEN}https://www.youtube.com/watch?v=-VxQU1w9L6w${ESC}, kudos!
+Concept by: ${AnsiGreen}Xcreate${AnsiEscape}, you can see his talking head here: ${AnsiGreen}https://www.youtube.com/watch?v=-VxQU1w9L6w${AnsiEscape}, kudos!
 
-Things to do${ESC}
+Things to do${AnsiEscape}
 
-To create keys first create a dir ${YELLOW}(if doesn't exist only)${ESC}
+To create keys first create a dir ${AnsiYellow}(if doesn't exist only)${AnsiEscape}
 
-${CODE_BLOCK}sudo mkdir ${CFG_APACHE_PATH}ssl${ESC_BLOCK}
+${CodeBlock}sudo mkdir ${CFG_APACHE_PATH}ssl${CodeBlockEsc}
 
 Generate certificates"
   fi
 
   echo -e "
-${CODE_LINE}sudo openssl genrsa -out ${CFG_APACHE_PATH}ssl/${DOMAIN}.key 2048${ESC_LINE}
-${CODE_LINE}sudo openssl req -new -x509 -key ${CFG_APACHE_PATH}ssl/$DOMAIN.key -out ${CFG_APACHE_PATH}ssl/${DOMAIN}.crt -days 3650 -subj /CN=${DOMAIN}${ESC_LINE}"
+${CodeInline}sudo openssl genrsa -out ${CFG_APACHE_PATH}ssl/${DOMAIN}.key 2048${CodeInlineEsc}
+${CodeInline}sudo openssl req -new -x509 -key ${CFG_APACHE_PATH}ssl/$DOMAIN.key -out ${CFG_APACHE_PATH}ssl/${DOMAIN}.crt -days 3650 -subj /CN=${DOMAIN}${CodeInlineEsc}"
 
   if [ $MUTED != true ]; then
     echo -e "
 Add new certificate to Keychains"
   fi
   echo -e "
-${CODE_BLOCK}sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ${CFG_APACHE_PATH}ssl/${DOMAIN}.crt${ESC_BLOCK}"
+${CodeBlock}sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ${CFG_APACHE_PATH}ssl/${DOMAIN}.crt${CodeBlockEsc}"
 
   if [ $MUTED != true ]; then
     echo -e "
-Setup VHOST  with port ${GREEN}443${ESC}
+Setup VHOST  with port ${AnsiGreen}443${AnsiEscape}
 
 Open your vhosts file"
   fi
 
   echo -e "
-${CODE_BLOCK}${CFG_EDITOR} ${CFG_VHOST_FILE}${ESC_BLOCK}"
+${CodeBlock}${CFG_EDITOR} ${CFG_VHOST_FILE}${CodeBlockEsc}"
 
   if [ $MUTED != true ]; then
     echo -e "
-And add this vhost ${YELLOW}(modify if exists)${ESC}
+And add this vhost ${AnsiYellow}(modify if exists)${AnsiEscape}
 
 "
   fi
@@ -208,24 +236,24 @@ function renderDefaultCert_3() {
   if [ $MUTED != true ]; then
     echo -e "
 If you want to set default certificate for all domains edit this file
-${RED}(be careful! it's enough to setup separate cert for each local domain)${ESC}"
+${AnsiRed}(be careful! it's enough to setup separate cert for each local domain)${AnsiEscape}"
   fi #muted
 
   echo -e "
-${CODE_BLOCK}${CFG_EDITOR} ${CFG_APACHE_PATH}extra/httpd-ssl.conf${ESC_BLOCK}"
+${CodeBlock}${CFG_EDITOR} ${CFG_APACHE_PATH}extra/httpd-ssl.conf${CodeBlockEsc}"
 
   if [ $MUTED != true ]; then
     echo -e "And change these values:"
   fi
 
   echo -e "
-${CODE_BLOCK}SSLCertificateFile \"${CFG_APACHE_PATH}/ssl /${DOMAIN}.crt\"
-SSLCertificateKeyFile \"${CFG_APACHE_PATH}/ssl /${DOMAIN}.key\"${ESC_BLOCK}
+${CodeBlock}SSLCertificateFile \"${CFG_APACHE_PATH}/ssl /${DOMAIN}.crt\"
+SSLCertificateKeyFile \"${CFG_APACHE_PATH}/ssl /${DOMAIN}.key\"${CodeBlockEsc}
 
 "
   if [ $MUTED != true ]; then
     echo -e "
-${GREEN}That's all about certificates, bye :)${ESC}
+${AnsiGreen}That's all about certificates, bye :)${AnsiEscape}
 
 "
   fi #muted
@@ -241,7 +269,7 @@ function displayHint() {
   echo $'\033[0;31mHey! Wrong arguments supplied, exactly three: domain, rootpath and third y or n for markdown are required like:\033[0m
 
 
-\033[0;32mvhost-template domain.loc /www/projects/domain y\033[0m'
+\033[0;32mvhost-template.sh  domain.loc /www/projects/domain y\033[0m'
 } # displayHint() end
 
 function clearConsole() {
@@ -291,59 +319,61 @@ function firstCheck() {
 } # firstCheck() end
 function suggestOtherTopics() {
   if [ $MUTED != true ]; then
-    echo -e "${GREEN}Info:${ESC}
+    echo -e "${AnsiGreen}Info:${AnsiEscape}
 
-You can also try these topics: ${GREEN}-t basic${ESC}, ${GREEN}-t ssl${ESC}, ${GREEN}-t cert${ESC}, ${GREEN}-t all${ESC}"
+You can also try these topics: ${AnsiGreen}-t basic${AnsiEscape}, ${AnsiGreen}-t ssl${AnsiEscape}, ${AnsiGreen}-t cert${AnsiEscape}, ${AnsiGreen}-t all${AnsiEscape}"
   fi
 }
 function sayGoodBye() {
   if [ $MUTED != true ]; then
     echo -e "
 
-${GREEN}Bye :)${ESC}
+${AnsiGreen}Bye :)${AnsiEscape}
 "
   fi
 } # sayGoodbye() end
 
 function showHelp() {
-  echo -e "
-${GREEN}This is help${ESC}
+  echo -e "${FirstLine}${Header1}${AnsiGreen}Help for ${CodeInline}${SemanticProject}${CodeInlineEsc} ver.: ${CodeInline}${SemanticVersion}${CodeInlineEsc}${AnsiEscape}
 
-${HELP_COLOR}-h --help${ESC}         To display this help
-${HELP_COLOR}-d --domain${ESC}       (required) name of the domain for this VHOST <ServerName>
-${HELP_COLOR}-r --root${ESC}         (required) name of the domain for this VHOST <DocumentRoot>
-${HELP_COLOR}-t --topic${ESC}        Topic to display, possible values
+© 2020 Marcus biesior Biesioroff
 
-                  ${HELP_COLOR}basic${ESC} Displays basic VHOST at port 80
-                  ${HELP_COLOR}ssl${ESC}   Displays SSL VHOST at port 443 and explains how to create certificate files
-                  ${HELP_COLOR}cert${ESC}  Explains  how to setup default certificate
-                  ${HELP_COLOR}all${ESC}   Displays all above
+${CodeBlock}${HelpColor}-h --help${AnsiEscape}         To display this help
+${HelpColor}-d --domain${AnsiEscape}       (required) name of the domain for this VHOST <ServerName>
+${HelpColor}-r --root${AnsiEscape}         (required) name of the domain for this VHOST <DocumentRoot>
+${HelpColor}-t --topic${AnsiEscape}        Topic to display, possible values
 
-${HELP_COLOR}-m --mode${ESC}         Mode for displaying
+                  ${HelpColor}basic${AnsiEscape} Displays basic VHOST at port 80
+                  ${HelpColor}ssl${AnsiEscape}   Displays SSL VHOST at port 443 and explains how to create certificate files
+                  ${HelpColor}cert${AnsiEscape}  Explains  how to setup default certificate
+                  ${HelpColor}all${AnsiEscape}   Displays all above
 
-                  ${HELP_COLOR}raw${ESC}      Displays basic VHOST at port 80
-                  ${HELP_COLOR}markdown${ESC} Displays SSL VHOST at port 443 and explains how to create certificate files
+${HelpColor}-m --mode${AnsiEscape}         Mode for displaying
+
+                  ${HelpColor}raw${AnsiEscape}      Displays basic VHOST at port 80
+                  ${HelpColor}markdown${AnsiEscape} Displays SSL VHOST at port 443 and explains how to create certificate files
                   if not set default with colors
 
-${HELP_COLOR}-i --interactive${ESC}  If interactive is enabled longer samples will be displayed one-by-one with brake for coffee
-${HELP_COLOR}--muted${ESC}           If muted most instructions will be disabled code will be shown only
+${HelpColor}-i --interactive${AnsiEscape}  If interactive is enabled longer samples will be displayed one-by-one with brake for coffee
+${HelpColor}--muted${AnsiEscape}           If muted most instructions will be disabled code will be shown only${CodeBlockEsc}
 
-Shortcuts:
+${Header3H3}Shortcuts:
 
 If you just want to generate vhosts and/or certivicates, just use these shortcuts (muted)
 
-${HELP_COLOR}--vhost${ESC}           Gets two unnamed params, domain and root, see samples
-${HELP_COLOR}--vhost-ssl${ESC}       Same as above, but shows SSL vhost
-${HELP_COLOR}--cert-ssl${ESC}        Same as above, but shows certificate generation
+${CodeBlock}${HelpColor}--vhost${AnsiEscape}           Gets two unnamed params, domain and root, see samples
+${HelpColor}--vhost-ssl${AnsiEscape}       Same as above, but shows SSL vhost
+${HelpColor}--cert-ssl${AnsiEscape}        Same as above, but shows certificate generation${CodeBlockEsc}
 
-Samples:
+${Header3H3}Samples:
 
-${CODE_COLOR}vhost-template -d my-project-1.loc -r /www/projects/my-project-1.loc$ --topic all --interactive ${ESC}
+${CodeBlock}${CodeColor}vhost-template.sh  -d my-project-1.loc -r /www/projects/my-project-1.loc$ --topic all --interactive ${AnsiEscape}${CodeBlockEsc}
 
-These three will show ready to use vhosts + certificates
-${CODE_COLOR}vhost-template --muted --vhost     foo.loc /www/projects/foo${ESC}
-${CODE_COLOR}vhost-template --muted --vhost-ssl foo.loc /www/projects/foo${ESC}
-${CODE_COLOR}vhost-template --muted --cert-ssl  foo.loc /www/projects/foo${ESC}
+${Header4}These three will show ready to use vhosts + certificates
+
+${CodeBlock}${CodeColor}vhost-template.sh  --muted --vhost     foo.loc /www/projects/foo${AnsiEscape}
+${CodeColor}vhost-template.sh  --muted --vhost-ssl foo.loc /www/projects/foo${AnsiEscape}
+${CodeColor}vhost-template.sh  --muted --cert-ssl  foo.loc /www/projects/foo${AnsiEscape}${CodeBlockEsc}
 "
 }
 
@@ -468,7 +498,7 @@ if [ $domainIsSet = false ] || [ $rootIsSet = false ]; then
   pressAnyKeyToFinish
   die "ERROR: Params: --domain (-d) and --root (-r) must be always settt
 
-see documentation for details using vhost-template -h
+see documentation for details using vhost-template.sh  -h
   "
 
 fi

@@ -1,9 +1,13 @@
-Help for bashtouch.sh ver.: 1.0.2
+global: .zsh
+local: .zsh
 
-© 2020 Marcus biesior Biesioroff
 
-What it does?
-As name suggest it's bash's `touch` version for bash scripts.
+* Help for bashtouch.sh ver. 1.0.3
+
+
+* What it does?
+
+As name suggest touch version of command for bash scripts.
 It just creates scratch shell script with .sh or .zsh, proper shebang and sample code inside.
 
 You can reuse sample code or remove it and write your own.
@@ -11,48 +15,86 @@ You can reuse sample code or remove it and write your own.
 Just leave generated shebang.
 See: https://en.wikipedia.org/wiki/Shebang_(Unix)
 
-Basic syntax:
+* Where
 
-  bashtouch.sh <filepath><optional-extension> <optional editor>
+<filepath> is absolute or relative path for new created script, if filename only given it will create script in current directory
 
-Where:
+<extension> should be .sh or .zsh, if not specified .sh will be added automatically.
 
-  <filepath> is absolute or relative path for new created script, if filename only given it will create script
-             in current directory
-  <optional-extension> should be one of: .sh, .zsh, .bash for bash script, if none .sh will be added
-  <optional editor>  If specified, after creation the file it will be opened in this editor, possibilities:
+<output> If specified, after creation the file it will be opened in this editor, possibilities:
 
-- Command line editors (if installed):
-  vim, nano, jed
+  * Display
 
-- GUI editors on Mac (if installed):
-  edit for default OSX editor,
-  sublime for OSX Sublime Text.app,
-  textedit for OSX TextEdit.app
+  - cat displays generated code in terminal
+  - none or blank finishes
 
-Samples:
+  * Command line editors (if installed)
 
-- (optionally)
-  cd /path/with/your/executables
+  - vim
+  - nano
+  - jed
 
-- To create script with `bash` shebang
-  bashtouch.sh foo.sh
+  * GUI editors on Mac (if installed)
 
-- To create script with `zsh` shebang
-  bashtouch.sh bar.zsh
+  - edit for default OSX editor
+  - sublime for OSX Sublime Text.app
+  - textedit for OSX TextEdit.app
 
-- Auto extension if not given will be .sh:
-  bashtouch.sh baz (creates baz.sh)
+* Samples
 
-- Of course you can always use absolute or relative path for new file like:
-  bashtouch.sh /full/path/to/zen.sh
-  bashtouch.sh ~/in-home-directory.sh
-  bashtouch.sh in-current-directory.sh
+* (optionally)
 
-If for some reason you want/need to use file without extension, just rename it after creation like:
+cd /path/with/your/executables
+
+* To create script with #!/usr/bin/env bash 5
+
+bashtouch.sh foo.sh
+
+* To create script with #!/usr/bin/env zsh 5
+bashtouch.sh foo.zsh
+
+* If extension is not given. default bash is created:
+
+bashtouch.sh baz  (creates baz.sh with #!/usr/bin/env bash shebang)
+
+* Of course you can always use absolute or relative path for new file like:
+
+bashtouch.sh /full/path/to/zen.sh
+bashtouch.sh ~/in-home-directory.sh
+bashtouch.sh in-current-directory.sh
+
+* If for some reason you want/need to use file without extension, just rename it after creation like
+
 mv new-script.sh new-script
 
-To disable colors permanently:
-Just edit the file and set value of DisableColors variable to true.
+* Exported variables
 
-Have fun :)
+To modify final output you can export some variables in your shell before executing bashtouch.sh
+or add selected exports to your profile file.
+
+* To check current exported variables, just echo one of them in your terminal, like 
+echo $BASHTOUCH_DEFAULT
+
+* To disable sample body (allowed true, false):
+export BASHTOUCH_BODY=false
+
+* To disable generator comment (allowed true, false):
+export BASHTOUCH_COMMENT=false
+
+* To disable colored output (allowed true, false):
+export BASHTOUCH_COLORS=false
+
+* To set default extension to be used when auto mode
+* required extension must be no-spaces word, starting with dot like .sh, .zsh, .my-own-extension
+* suggested .sh or .zsh
+* default .sh
+export BASHTOUCH_DEFAULT=.sh
+
+
+* That's all!
+Now you can run:
+bashtouch.sh have-fun-:-p
+
+© 2020 Marcus biesior Biesioroff
+
+
